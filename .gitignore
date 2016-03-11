@@ -36,10 +36,5 @@ jspm_packages
 # Optional REPL history
 .node_repl_history
 
-
-### jspm ###
-jspm_packages
-
-
 ### VisualStudioCode ###
 .vscode
