@@ -1,0 +1,11 @@
+#prediction > table {
+  margin-top: 20px;
+}
+
+#prediction > form > input[name="pattern"] {
+  text-transform: uppercase;
+}
+
+.tab-content .tab-pane {
+  padding: 20px;
+}
