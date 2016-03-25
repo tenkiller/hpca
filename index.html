@@ -12,16 +12,16 @@
     <div>
       <!--tabs-->
       <ul class="nav nav-tabs" role="tablist">
-        <li class="active" role="presentation">
+        <li class="" role="presentation">
           <a href="#prediction" role="tab" data-toggle="tab">Branch Prediction</a>
         </li>
-        <li role="presentation">
+        <li class="active" role="presentation">
           <a href="#pipeline" role="tab" data-toggle="tab">Processor Pipeline</a>
         </li>
       </ul>
       <!--tabs content-->
       <div class="tab-content">
-        <div id="prediction" class="tab-pane active" role="tabpanel">
+        <div id="prediction" class="tab-pane" role="tabpanel">
           <form class="form-inline">
             <span>Using a </span>
             <input name="bits" type="number" class="form-control input-sm" value="1" min="1" max="2">
@@ -52,8 +52,17 @@
             <tbody>
           </table>
         </div>
-        <div id="pipeline" class="tab-pane" role="tabpanel">
-          <h4><em>Coming soon...</em></h4>
+        <div id="pipeline" class="tab-pane active" role="tabpanel">
+          <form>
+            <label for="instructions">Instructions</label>
+            <textarea id="instructions" name="instructions" class="form-control" required></textarea>
+            <button type="submit" class="btn btn-primary btn-sm">Process</button>
+            <button type="reset" class="btn btn-default btn-sm">Reset</button>
+          </form>
+          <div>
+            <label for="">Pipeline Log</label>
+            
+          </div>
         </div>
       </div>
     </div>

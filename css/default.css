@@ -6,6 +6,24 @@
   text-transform: uppercase;
 }
 
+#pipeline > form, #pipeline > div {
+  display: inline-block;
+  vertical-align: top;
+}
+
+#pipeline > form {
+  width: 33%;
+}
+
+#pipeline > form > textarea {
+  height: 300px;
+  margin-bottom: 10px;
+}
+
+#pipeline > div {
+  margin-left: 20px;
+}
+
 .tab-content .tab-pane {
   padding: 20px;
 }

@@ -4,6 +4,7 @@ import './css/default.css!';
 
 import $ from 'bootstrap';
 import processPattern from './src/branch_prediction';
+import Pipeline from './src/processor_pipeline';
 
 let predForm = $('#prediction > form'),
     predTable = $('#prediction > table');
