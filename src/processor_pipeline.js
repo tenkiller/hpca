@@ -53,6 +53,8 @@ class Pipeline {
       this.memory();
       this.write();
     }
+    
+    return this.log;
   }
 }
 

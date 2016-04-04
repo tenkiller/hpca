@@ -28,7 +28,7 @@ predForm.submit(function(e) {
   // TODO: implement function as a Promise
   let results = processPattern(inputs.pattern, inputs.pass);
   
-  // clear out and previous rows in the results table
+  // clear out any previous rows in the results table
   predTable.find('tbody > tr').remove();
   
   for (let result of results) {
@@ -51,7 +51,14 @@ predForm.submit(function(e) {
 
 pipeForm.submit(function(e) {
   let data = $(this).serializeArray(),
-      inputs = parseForm(data);
+      inputs = parseForm(data),
+      pipeline = new Pipeline(inputs.instructions.split('\n')),
+      output = pipeline.run(),
+      list = $('#output').find('ol');
+  
+  $.each(output, function(i, obj) {
+    list.append($('<li>').text(obj));
+  });
       
   e.preventDefault();
 });
