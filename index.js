@@ -6,16 +6,23 @@ import $ from 'bootstrap';
 import processPattern from './src/branch_prediction';
 import Pipeline from './src/processor_pipeline';
 
-let predForm = $('#prediction > form'),
-    predTable = $('#prediction > table');
-
-predForm.submit(function(e) {
-  let data = $(this).serializeArray(),
-      inputs = {};
+let parseForm = (data) => {
+  let inputs = {};
   
   $.each(data, function(i, obj) {
     inputs[obj.name] = obj.value;
   });
+  
+  return inputs;
+};
+
+let predForm = $('#prediction > form'),
+    predTable = $('#prediction > table'),
+    pipeForm = $('#pipeline > form');
+
+predForm.submit((e) => {
+  let data = $(this).serializeArray(),
+      inputs = parseForm(data);
   
   // TODO: implement different branch predictor types
   // TODO: implement function as a Promise
@@ -41,3 +48,12 @@ predForm.submit(function(e) {
   
   e.preventDefault();
 });
+
+pipeForm.submit((e) => {
+  let data = $(this).serializeArray(),
+      inputs = parseForm(data);
+      
+  e.preventDefault();
+});
+
+

@@ -1,4 +1,6 @@
-
+/** 
+ * @class Pipeline  
+ */
 class Pipeline {
   constructor(instructionQueue) {
     this.queue = instructionQueue;
@@ -55,8 +57,3 @@ class Pipeline {
 }
 
 export default Pipeline;
-
-var instructions = ['ADD R1,R2,1', 'SUB R3,R4,2'],
-    pipeline = new Pipeline(instructions);
-    
-pipeline.run();
