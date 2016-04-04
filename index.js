@@ -20,7 +20,7 @@ let predForm = $('#prediction > form'),
     predTable = $('#prediction > table'),
     pipeForm = $('#pipeline > form');
 
-predForm.submit((e) => {
+predForm.submit(function(e) {
   let data = $(this).serializeArray(),
       inputs = parseForm(data);
   
@@ -49,7 +49,7 @@ predForm.submit((e) => {
   e.preventDefault();
 });
 
-pipeForm.submit((e) => {
+pipeForm.submit(function(e) {
   let data = $(this).serializeArray(),
       inputs = parseForm(data);
       

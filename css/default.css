@@ -1,9 +1,9 @@
-#prediction > table {
-  margin-top: 20px;
-}
-
 #prediction > form > input[name="pattern"] {
   text-transform: uppercase;
+}
+
+#prediction > table {
+  margin-top: 20px;
 }
 
 #pipeline > form, #pipeline > div {
@@ -15,13 +15,19 @@
   width: 33%;
 }
 
-#pipeline > form > textarea {
-  height: 300px;
-  margin-bottom: 10px;
+#pipeline > div {
+  width: 66%;
 }
 
-#pipeline > div {
-  margin-left: 20px;
+#pipeline .panel {
+  height: 540px;
+  width: 100%;
+  overflow-y: scroll;
+}
+
+#instructions {
+  height: 540px;
+  margin-bottom: 20px;
 }
 
 .tab-content .tab-pane {
