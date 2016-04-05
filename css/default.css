@@ -28,6 +28,7 @@
 #instructions {
   height: 540px;
   margin-bottom: 20px;
+  text-transform: uppercase;
 }
 
 .tab-content .tab-pane {

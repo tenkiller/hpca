@@ -1,57 +1,88 @@
 /** 
- * @class Pipeline  
+ * This class simulates a naive one-issue, 5-stage processor pipeline. Dependencies between instructions are not 
+ * enforced. It also assumes that each stage of the pipeline executes in exactly one cycle, with no stalls or bubbles.
+ * @class Pipeline
  */
 class Pipeline {
-  constructor(instructionQueue) {
-    this.queue = instructionQueue;
+  constructor(instructions) {
+    this.instructions = instructions;
+    this.stack = [];
+    this.callbacks = [];
+    this.cycle = 1;
     this.log = [];
   }
   
-  fetch() {
-    // fetch instruction from the queue
-    this.instruction = this.queue.shift();
-    this.log.push(`FETCHED instruction "${this.instruction}"`);
+  fetch(cycle) {
+    // fetch the instruction
+    let instruction = this.instructions.shift();
+        
+    this.callbacks.push({ cycle: cycle+1, func: this.decode, args: [instruction] });
+    this.log.push(`${cycle} : FETCHED instruction "${instruction}"`);
   }
   
-  decode() {
-    // interpret instruction opcode and operands
-    if (!this.instruction) {
+  decode(cycle, [instruction]) {    
+    if (!instruction) {
       throw new ReferenceError('No instruction to decode.');
     }
     
-    let parts = this.instruction.split(' ');
-    this.opcode = parts[0];
-    this.operands = parts[1].split(',');
+    // interpret instruction opcode and operands
+    let parts = instruction.split(' '),
+        opcode = parts[0],
+        operands = parts[1].split(',');
     
-    this.log.push(`DECODED instruction into opcode "${this.opcode}" and operands "[${this.operands.join(',')}]"`);
+    this.callbacks.push({ cycle: cycle+1, func: this.execute, args: [instruction, opcode, operands] });
+    this.log.push(`${cycle} : DECODED instruction into opcode "${opcode}" and operands "${operands.join(',')}"`);
   }
   
-  execute() {
-    // perform calculations on data and memory addresses
-    if (!this.opcode || !this.operands) {
+  execute(cycle, [instruction, opcode, operands]) {    
+    if (!opcode || !operands) {
       throw new ReferenceError('No opcode or operands to execute.');
     }
-    
-    this.log.push(`EXECUTED "${this.opcode}" on "[${this.operands.slice(1).join(',')}]"`);
+    // perform calculations on data and memory addresses
+    this.callbacks.push({ cycle: cycle+1, func: this.memory, args: [instruction] });    
+    this.log.push(`${cycle} : EXECUTED "${opcode}" on "${operands.slice(1).join(',')}"`);
   }
   
-  memory() {
+  memory(cycle, [instruction]) {
     // load and store data to memory
-    this.log.push(`MEMORY accessed for "${this.instruction}"`);
+    this.callbacks.push({ cycle: cycle+1, func: this.write, args: [instruction] });
+    this.log.push(`${cycle} : MEMORY accessed for "${instruction}"`);
   }
   
-  write() {
+  write(cycle, [instruction]) {
     // write results to registers
-    this.log.push(`WRITE performed to "[${this.operands[0]}]" for "${this.instruction}"`);
+    this.log.push(`${cycle} : WRITE performed for "${instruction}"`);
   }
   
-  run() {
-    while(this.queue.length) {
-      this.fetch();
-      this.decode();
-      this.execute();
-      this.memory();
-      this.write();
+  run() {    
+    while (true) {
+      // if there's an instruction, fetch it
+      if (this.instructions.length) {
+        this.stack.push({ cycle: this.cycle, func: this.fetch });
+      }
+      
+      // add all pipeline callbacks to the execution stack
+      while (this.callbacks.length) {
+        this.stack.push(this.callbacks.shift());
+      }
+      
+      // get only the steps in the pipeline that execute this cycle
+      let steps = this.stack.filter((obj) => {
+        return obj.cycle === this.cycle;
+      });
+      
+      // if there's nothing to execute, we're done
+      if (!steps.length) {
+        break;
+      }
+      
+      // run the pipeline steps for this cycle
+      while (steps.length) {
+        let step = steps.shift();
+        step.func.call(this, step.cycle, step.args);
+      }
+    
+      this.cycle++;
     }
     
     return this.log;

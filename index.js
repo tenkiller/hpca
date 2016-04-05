@@ -63,4 +63,6 @@ pipeForm.submit(function(e) {
   e.preventDefault();
 });
 
-
+pipeForm.on('reset', function() {
+  $('#output').find('ol > li').remove();
+});
