@@ -7,7 +7,6 @@ class Pipeline {
   constructor(instructions) {
     this.instructions = instructions;
     this.stack = [];
-    this.callbacks = [];
     this.cycle = 1;
     this.log = [];
   }
@@ -16,7 +15,7 @@ class Pipeline {
     // fetch the instruction
     let instruction = this.instructions.shift();
         
-    this.callbacks.push({ cycle: cycle+1, func: this.decode, args: [instruction] });
+    this.stack.push({ cycle: cycle+1, func: this.decode, args: [instruction] });
     this.log.push(`${cycle} : FETCHED instruction "${instruction}"`);
   }
   
@@ -30,7 +29,7 @@ class Pipeline {
         opcode = parts[0],
         operands = parts[1].split(',');
     
-    this.callbacks.push({ cycle: cycle+1, func: this.execute, args: [instruction, opcode, operands] });
+    this.stack.push({ cycle: cycle+1, func: this.execute, args: [instruction, opcode, operands] });
     this.log.push(`${cycle} : DECODED instruction into opcode "${opcode}" and operands "${operands.join(',')}"`);
   }
   
@@ -39,13 +38,13 @@ class Pipeline {
       throw new ReferenceError('No opcode or operands to execute.');
     }
     // perform calculations on data and memory addresses
-    this.callbacks.push({ cycle: cycle+1, func: this.memory, args: [instruction] });    
+    this.stack.push({ cycle: cycle+1, func: this.memory, args: [instruction] });    
     this.log.push(`${cycle} : EXECUTED "${opcode}" on "${operands.slice(1).join(',')}"`);
   }
   
   memory(cycle, [instruction]) {
     // load and store data to memory
-    this.callbacks.push({ cycle: cycle+1, func: this.write, args: [instruction] });
+    this.stack.push({ cycle: cycle+1, func: this.write, args: [instruction] });
     this.log.push(`${cycle} : MEMORY accessed for "${instruction}"`);
   }
   
@@ -61,18 +60,14 @@ class Pipeline {
         this.stack.push({ cycle: this.cycle, func: this.fetch });
       }
       
-      // add all pipeline callbacks to the execution stack
-      while (this.callbacks.length) {
-        this.stack.push(this.callbacks.shift());
-      }
-      
-      // get only the steps in the pipeline that execute this cycle
+      // get only the steps in the pipeline stack that execute this cycle
       let steps = this.stack.filter((obj) => {
         return obj.cycle === this.cycle;
       });
       
       // if there's nothing to execute, we're done
       if (!steps.length) {
+        this.log.push('--DONE--');
         break;
       }
       
