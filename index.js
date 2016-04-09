@@ -3,13 +3,18 @@ import 'font-awesome/css/font-awesome.css!';
 import './css/default.css!';
 
 import $ from 'bootstrap';
-import processPattern from './src/branch_prediction';
+import process from './src/branch_prediction';
 import Pipeline from './src/processor_pipeline';
 
 let parseForm = (data) => {
   let inputs = {};
   
   $.each(data, function(i, obj) {
+    // convert string numbers to its integer value
+    if (obj.value % 1 === 0) {
+      obj.value = parseInt(obj.value);
+    }
+    
     inputs[obj.name] = obj.value;
   });
   
@@ -17,16 +22,16 @@ let parseForm = (data) => {
 };
 
 let predForm = $('#prediction > form'),
-    predTable = $('#prediction > table'),
-    pipeForm = $('#pipeline > form');
+    predTable = $('#pred_output'),
+    pipeForm = $('#pipeline > form'),
+    pipeList = $('#pipe_list').find('ol');
 
 predForm.submit(function(e) {
   let data = $(this).serializeArray(),
       inputs = parseForm(data);
   
-  // TODO: implement different branch predictor types
   // TODO: implement function as a Promise
-  let results = processPattern(inputs.pattern, inputs.pass);
+  let results = process(inputs.bits, inputs.type, inputs.pattern, inputs.pass);
   
   // clear out any previous rows in the results table
   predTable.find('tbody > tr').remove();
@@ -40,8 +45,8 @@ predForm.submit(function(e) {
     predTable.append(`<tr>
       <td>${result[0]}</td>
       <td>${result[1]}</td>
-      <td>${result[2]}</td>
-      <td>${result[3]}</td>
+      <td>${result[2] ? 'Taken' : 'Not Taken'}</td>
+      <td>${result[3] ? 'Taken' : 'Not Taken'}</td>
       <td>${correct}</td>
     </tr>`);
   }
@@ -53,11 +58,10 @@ pipeForm.submit(function(e) {
   let data = $(this).serializeArray(),
       inputs = parseForm(data),
       pipeline = new Pipeline(inputs.instructions.split('\n')),
-      output = pipeline.run(),
-      list = $('#output').find('ol');
+      output = pipeline.run();
   
   $.each(output, function(i, obj) {
-    list.append($('<li>').text(obj));
+    pipeList.append($('<li>').text(obj));
   });
       
   e.preventDefault();

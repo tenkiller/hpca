@@ -2,8 +2,25 @@
   text-transform: uppercase;
 }
 
-#prediction > table {
-  margin-top: 20px;
+#prediction > form {
+  margin-bottom: 20px;
+}
+
+#prediction .table {
+  margin-bottom: 0;
+}
+
+#prediction .table th {
+  border-bottom: 0;
+}
+
+#prediction .table-header-wrapper {
+  padding-right: 17px;
+}
+
+#prediction .table-body-wrapper {
+  height: 500px;
+  overflow-y: scroll;
 }
 
 #pipeline > form, #pipeline > div {

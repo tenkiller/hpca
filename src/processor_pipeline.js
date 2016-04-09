@@ -11,7 +11,7 @@ class Pipeline {
     this.log = [];
   }
   
-  fetch(cycle) {
+  fetch([cycle]) {
     // fetch the instruction
     let instruction = this.instructions.shift();
         
@@ -19,7 +19,7 @@ class Pipeline {
     this.log.push(`${cycle} : FETCHED instruction "${instruction}"`);
   }
   
-  decode(cycle, [instruction]) {    
+  decode([cycle, instruction]) {    
     if (!instruction) {
       throw new ReferenceError('No instruction to decode.');
     }
@@ -33,7 +33,7 @@ class Pipeline {
     this.log.push(`${cycle} : DECODED instruction into opcode "${opcode}" and operands "${operands.join(',')}"`);
   }
   
-  execute(cycle, [instruction, opcode, operands]) {    
+  execute([cycle, instruction, opcode, operands]) {    
     if (!opcode || !operands) {
       throw new ReferenceError('No opcode or operands to execute.');
     }
@@ -42,13 +42,13 @@ class Pipeline {
     this.log.push(`${cycle} : EXECUTED "${opcode}" on "${operands.slice(1).join(',')}"`);
   }
   
-  memory(cycle, [instruction]) {
+  memory([cycle, instruction]) {
     // load and store data to memory
     this.stack.push({ cycle: cycle+1, func: this.write, args: [instruction] });
     this.log.push(`${cycle} : MEMORY accessed for "${instruction}"`);
   }
   
-  write(cycle, [instruction]) {
+  write([cycle, instruction]) {
     // write results to registers
     this.log.push(`${cycle} : WRITE performed for "${instruction}"`);
   }
@@ -74,7 +74,7 @@ class Pipeline {
       // run the pipeline steps for this cycle
       while (steps.length) {
         let step = steps.shift();
-        step.func.call(this, step.cycle, step.args);
+        step.func.call(this, Array.prototype.concat(step.cycle, step.args));
       }
     
       this.cycle++;
