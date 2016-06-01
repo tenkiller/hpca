@@ -1,11 +1,16 @@
 
 class Buffer {
-  constructor() {
+  constructor(limit) {
     this.buffer = [];
+    this.limit = limit;
   }
   
   add(element) {
-    this.buffer.push(element);
+    if (this.size < this.limit) {
+      this.buffer.push(element);
+      return true; 
+    }
+    return false;
   }
   
   get size() {
@@ -13,15 +18,30 @@ class Buffer {
   }
 }
 
+class RegisterFile extends Buffer {
+  constructor(limit) {
+    super(limit);
+  }
+}
+
 class ReservationStation extends Buffer {
-  constructor() {
-    super();
+  constructor(limit) {
+    super(limit);
+  }
+}
+
+class ReservationStationElement {
+  constructor(type, tagA, tagB, valA, valB) {
+    this.type = type;
+    this.tags = [tagA, tagB];
+    this.vals = [valA, valB];
+    this.answer = null;
   }
 }
 
 class ReOrderBuffer extends Buffer {
-  constructor() {
-    super();
+  constructor(limit) {
+    super(limit);
   }
 }
 
@@ -33,4 +53,4 @@ class DynamicScheduler {
   }
 }
 
-export default DynamicScheduler;
+export { DynamicScheduler, ReservationStation, ReOrderBuffer };
