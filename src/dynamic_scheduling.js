@@ -1,48 +1,11 @@
 
-class Buffer {
-  constructor() {
-    this.buffer = [];
-  }
-  
-  get size() {
-    return this.buffer.length;
-  }
-}
-
 class RegisterFile {
   constructor(limit) {
     this.registers = {};
-    this.size = limit - 1;
     
     for (let i = 1; i <= limit; i++) {
       this.registers['R' + i] = null;
     }
-  }
-}
-
-class InstructionQueue extends Buffer {
-  constructor(queue) {
-    super();
-
-    for (let instruction of queue) {
-      this.add(instruction);
-    }
-  }
-  
-  add(instruction) {
-    let parts = this.parse(instruction),
-        element = new InstructionQueueElement(parts.opcode, parts.operands);
-    
-    this.buffer.push(element);
-  }
-  
-  parse(instruction) {
-    // interpret instruction opcode and operands
-    let parts = instruction.split(' '),
-        opcode = parts[0],
-        operands = parts[1].split(',');
-        
-    return { opcode, operands };
   }
 }
 
@@ -57,10 +20,35 @@ class InstructionQueueElement {
   }
 }
 
-class ReservationStation extends Buffer {
-  constructor(limit) {
-    super();
-    this.limit = limit;
+class InstructionQueue {
+  constructor(queue) {
+    this.queue = [];
+
+    for (let instruction of queue) {
+      this.add(instruction);
+    }
+  }
+
+  parse(instruction) {
+    // interpret instruction opcode and operands
+    let parts = instruction.split(' '),
+        opcode = parts[0],
+        operands = parts[1].split(',');
+        
+    return { opcode, operands };
+  }
+  
+  add(instruction) {
+    let opcode, operands = this.parse(instruction),
+        element = new InstructionQueueElement(opcode, operands);
+    
+    this.queue.push(element);
+  }
+
+  next() {
+    if (this.queue.length) {
+      return this.queue.shift();
+    }
   }
 }
 
@@ -73,10 +61,20 @@ class ReservationStationElement {
   }
 }
 
-class ReOrderBuffer extends Buffer {
+class ReservationStation {
   constructor(limit) {
-    super();
+    this.table = {};
     this.limit = limit;
+    this.counter = 0;
+  }
+
+  ready() {
+    return Object.keys(this.table).length < this.limit;
+  }
+
+  add(element) {
+    this.table[this.counter] = element;
+    return this.counter++;
   }
 }
 
@@ -86,6 +84,24 @@ class ReOrderBufferElement {
     this.dest = dest;
     this.value = 0;
     this.done = false;
+  }
+}
+
+class ReOrderBuffer {
+  constructor(limit) {
+    this.buffer = {};
+    this.limit = limit;
+    this.counter = 0;
+    this.commit_ndx = 0;
+  }
+
+  ready() {
+    return Object.keys(this.buffer).length < this.limit;
+  }
+
+  add(element) {
+    this.buffer[this.counter] = element;
+    return this.counter++;
   }
 }
 
@@ -99,8 +115,19 @@ class DynamicScheduler {
   }
 
   run() {
-    for (let i = 0; i < this.queue.size; i++) {
-      // TODO
+    let instruction = this.queue.next();
+
+    while (instruction) {
+      // if there are spaces available in the reservation station and reorder buffer
+      if (this.rs.ready() && this.rob.ready()) {
+        let rs_element = new ReservationStationElement(),
+            rob_element = new ReOrderBufferElement();
+
+        this.rs.add(rs_element);
+        this.rob.add(rob_element);
+      }
+
+      instruction = this.queue.next();
     }
   }
 
